@@ -10,11 +10,43 @@ define('DIVI_CHILD_VERSION', '2.0.5');
  */
 function divi_child_enqueue_scripts() {
   wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css' );
+
+  divi_child_enqueue_assets_automatic(get_stylesheet_directory_uri() . '/assets/css/', 'css');
+  divi_child_enqueue_assets_automatic(get_stylesheet_directory_uri() . '/assets/js/', 'js');
+
+
+
+
+  /*wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css' );
   wp_enqueue_style('divi-fonts', get_stylesheet_directory_uri() . '/assets/css/fonts.css');
-  wp_enqueue_script( 'divi-scripts', get_stylesheet_directory_uri() . '/assets/js/main.js', array(), null, true);
+  wp_enqueue_script( 'divi-scripts', get_stylesheet_directory_uri() . '/assets/js/main.js', array(), null, true);*/
 }
 add_action( 'wp_enqueue_scripts', 'divi_child_enqueue_scripts' );
 
+function divi_child_enqueue_assets_automatic ($dir_asset, $mode) {
+  /*
+    Dynamic: Load everything in $dir_asset in alphabetical order
+  */
+  $files = array();
+  $dir = opendir($dir_asset);
+  while(false != ($file = readdir($dir))) {
+    if(($file != ".") and ($file != "..") and ($file != "index.php")) {
+            $files[] = $file; // put in array.
+    }
+  }
+
+  natsort($files); // sort.
+
+  // print.
+  foreach($files as $file) {
+    if ($mode == "css") {
+      wp_enqueue_style($file, $dir_asset . $file);
+    }
+    else if ($mode == "js") {
+      wp_enqueue_script($file, $dir_asset . $file, array(), null, true);
+    }
+  }
+}
 
 /**
  * STATIC: Load all language files
@@ -55,5 +87,11 @@ include_once('includes/child_misc.php');
 
 /** -------- Add your own code after this! -------- **/
 
+function divi_child_enqueue_custom_scripts() {
+  wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css' );
+  wp_enqueue_style('divi-fonts', get_stylesheet_directory_uri() . '/assets/css/fonts.css');
+  wp_enqueue_script( 'divi-scripts', get_stylesheet_directory_uri() . '/assets/js/main.js', array(), null, true);
+}
+add_action( 'wp_enqueue_scripts', 'divi_child_enqueue_custom_scripts' );
 
 ?>
